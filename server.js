@@ -6,10 +6,18 @@ const app = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 
+let today = new Date
+let date = today.getDate() + '-' + ( today.getMonth() + 1 ) + '-' + today.getFullYear();
+let hour = today.getHours()+2 + ':' + today.getMinutes() + ':' + today.getSeconds();
+let dateAndHour = date + ' ' + hour;
+
 const welcomeMessage = {
   id: 0,
   from: "Bart",
   text: "Welcome to CYF chat system!",
+  timeSent:dateAndHour
+  
+  
 };
 
 //This array is our "data store".
@@ -65,12 +73,16 @@ app.delete("/messages/:id", function (request, response) {
 app.post("/messages", function (request, response) {
   const from = request.body.from;
   const text = request.body.text;
+  let today = new Date
+let date = today.getDate() + '-' + ( today.getMonth() + 1 ) + '-' + today.getFullYear();
+let hour = today.getHours()+2 + ':' + today.getMinutes() + ':' + today.getSeconds();
+let dateAndHour = date + ' ' + hour
 
   from === "" || text === ""
     ? response.status(400).send({
         message: "The objects have an empty or missing text or from property",
       })
-    : messages.push({ id: messages.length, from, text });
+    : messages.push({ id: messages.length, from, text,timeSent:dateAndHour });
 });
 
 app.listen(3000, () => {
