@@ -16,51 +16,61 @@ const welcomeMessage = {
 //We will start with one message in the array.
 //Note: messages will be lost when Glitch restarts our server.
 const messages = [welcomeMessage];
-
+//GET
 app.get("/", function (request, response) {
   //me dirige a la ruta del index.html
   response.sendFile(__dirname + "/index.html");
 });
 
-app.get("/messages", function (request, response) {
-  const a = JSON.stringify(messages);
+app.get("/messages/latest", function (request, response) {
+  let text = request.query.text;
 
-  response.send(a);
+  let latest = messages.filter((message,index,ar)=> message.id>ar.length-12)
+
+  response.send(latest);
+});
+app.get("/messages/search", function (request, response) {
+  let text = request.query.text;
+
+  let filterByString = messages.filter((message) =>
+    message.text.includes(text)
+  );
+
+  response.send(filterByString);
+});
+
+app.get("/messages", function (request, response) {
+  const allMessages = messages.map((message) => message);
+
+  response.send(allMessages);
 });
 app.get("/messages/:id", function (request, response) {
   const id = Number(request.params.id);
 
-  let a = messages.find((message) => message.id === id);
+  let filterById = messages.find((message) => message.id === id);
 
-  response.send(a);
+  response.send(filterById);
 });
 
+//DELETE
 app.delete("/messages/:id", function (request, response) {
   const id = Number(request.params.id);
 
-  let a = messages.findIndex((message) => message.id === id);
-  messages.splice(a, 1);
+  let deleteById = messages.findIndex((message) => message.id === id);
+  messages.splice(deleteById, 1);
 
   response.send();
 });
-
+//POST
 app.post("/messages", function (request, response) {
   const from = request.body.from;
   const text = request.body.text;
 
   from === "" || text === ""
-    ? response
-        .status(400)
-        .send({
-          message: "The objects have an empty or missing text or from property",
-        })
+    ? response.status(400).send({
+        message: "The objects have an empty or missing text or from property",
+      })
     : messages.push({ id: messages.length, from, text });
-
-  const a = JSON.stringify(messages);
-
-  /*  
-
-   */
 });
 
 app.listen(3000, () => {
